@@ -76,7 +76,7 @@ function loadArcadeMachines(){
 	}
 
 	var flashingScaleX = .4, flashingScaleY=.7;
-	var flashingAnimationLocations = [{x:110,y:150,rotation:0, speed:10},{x:110,y:250,rotation:0, speed:0},{x:110,y:350,rotation:0, speed:2},{x:580,y:350,rotation:0, speed:0},{x:580,y:250,rotation:0, speed:2},{x:380,y:350,rotation:180, speed:10},{x:380,y:250,rotation:180, speed:1},{x:300,y:150,rotation:90, speed:1},{x:400,y:150,rotation:90, speed:0},{x:800,y:150,rotation:90, speed:10}];
+	var flashingAnimationLocations = [{x:110,y:150,rotation:0, speed:10},{x:110,y:250,rotation:0, speed:0},{x:110,y:350,rotation:0, speed:2},{x:580,y:350,rotation:0, speed:0},{x:580,y:250,rotation:0, speed:2},{x:380,y:350,rotation:180, speed:10},{x:380,y:250,rotation:180, speed:1},{x:900,y:150,rotation:90, speed:1},{x:400,y:150,rotation:90, speed:0},{x:800,y:150,rotation:90, speed:10}];
 	var animationName = "arcade-screen";
 	for (var i  = 0; i < flashingAnimationLocations.length; i++){
 		var s = game.add.sprite(flashingAnimationLocations[i].x,flashingAnimationLocations[i].y, animationName);
