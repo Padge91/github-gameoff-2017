@@ -3,7 +3,7 @@ var gameWindowSize ={x:1000, y:600};
 var game = new Phaser.Game(gameWindowSize.x, gameWindowSize.y, Phaser.CANVAS, 'github-gameoff-2017', {preload:preload, create:create, update:update});
 var player = null;
 var cursors = null;
-var speed = 150;
+var speed = 200;
 var colliders = null;
 
 
@@ -150,6 +150,11 @@ function loadNPCs(){
                         s.anchor.setTo(.75,0);
                         s.scale.x *= -1;
                 }
+		game.physics.enable(s, Phaser.Physics.ARCADE);
+		s.body.immovable = true;
+		s.body.setSize(-110,-50,270,200);
+		colliders.add(s);
+
 	}
 	
 }
