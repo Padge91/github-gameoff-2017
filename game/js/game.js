@@ -3,7 +3,7 @@ var gameWindowSize ={x:1000, y:600};
 var game = new Phaser.Game(gameWindowSize.x, gameWindowSize.y, Phaser.CANVAS, 'github-gameoff-2017', {preload:preload, create:create, update:update});
 var player = null;
 var cursors = null;
-var speed = 200;
+var speed = 170;
 var colliders = null;
 
 
