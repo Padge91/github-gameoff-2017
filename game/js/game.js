@@ -1,6 +1,11 @@
 var gameWindowSize ={x:1000, y:600};
 
-var game = new Phaser.Game(gameWindowSize.x, gameWindowSize.y, Phaser.CANVAS, 'github-gameoff-2017', {preload:preload, create:create});
+var game = new Phaser.Game(gameWindowSize.x, gameWindowSize.y, Phaser.CANVAS, 'github-gameoff-2017', {preload:preload, create:create, update:update});
+var player = null;
+var cursors = null;
+var speed = 150;
+var colliders = null;
+
 
 //load assets
 function preload() {
@@ -23,7 +28,7 @@ function loadAnimations(){
 function loadTextures(){
 	var texturesPath="/images/";
 	var extension=".png";
-	var textures=["test", "floor-pattern", "arcade-machine-side-perspective-red", "arcade-machine-side-perspective-purple", "arcade-machine-side-perspective-green", "arcade-machine-side-perspective-blue", "arcade-machine-front-pixelated", "character1","character2","character3","character4","character1-back","character2-back","lighting"];
+	var textures=["test", "floor-pattern", "arcade-machine-side-perspective-red", "arcade-machine-side-perspective-purple", "arcade-machine-side-perspective-green", "arcade-machine-side-perspective-blue", "arcade-machine-front-pixelated", "character1","character2","character3","character4","character1-back","character2-back","lighting","no-play"];
 	
 	for (var i = 0; i < textures.length; i++){
 		game.load.image(textures[i], texturesPath+textures[i]+extension);
@@ -33,46 +38,79 @@ function loadTextures(){
 //start
 function create() {
 	loadArcadeScene();
+	loadPlayer();
 }
 
 
 //load arcade scene
 function loadArcadeScene(){
 	loadArcadeFloor();
-	loadArcadeWalls();
+	colliders = game.add.group();
 	loadArcadeMachines();
 	loadNPCs();
-	loadPlayer();
 }
 
 //load player
 function loadPlayer(){
+	player = game.add.sprite(100,100,'character1');
+	player.scale.setTo(.3,.3);
+	cursors = game.input.keyboard.createCursorKeys();
+
+	game.physics.startSystem(Phaser.Physics.ARCADE);
+	game.physics.arcade.enable(player, Phaser.Physics.ARCADE);
+	//game.world.setBounds(0, 0, gameWindowSize.x, gameWindowSize.y);
 
 }
 
-//load arcade walls
-function loadArcadeWalls(){
 
+function update(){
+	player.body.velocity.x = 0;
+	player.body.velocity.y = 0;
+
+	game.physics.arcade.collide(player, colliders);
+
+	if (cursors.up.isDown){
+		player.body.velocity.y -= speed;
+	} else if (cursors.down.isDown){
+		player.body.velocity.y += speed;
+	}
+	if (cursors.left.isDown){
+		player.body.velocity.x -= speed;
+	} else if (cursors.right.isDown){
+		player.body.velocity.x += speed;
+	}
+}
+
+function collisionHandler(){
+	//console.log("out");
 }
 
 //load arcade machines
 function loadArcadeMachines(){
-	var frontArcadeMachineLocations = [{x:0,y:0},{x:100,y:0},{x:200,y:0},{x:600,y:0},{x:500,y:0}]
+	var frontArcadeMachineLocations = [{x:145,y:30},{x:245,y:30},{x:350,y:30},{x:650,y:30},{x:750,y:30}]
 	var machineScale = .7;
 	for (var i = 0; i < frontArcadeMachineLocations.length; i++){
 		var s = game.add.sprite(frontArcadeMachineLocations[i].x, frontArcadeMachineLocations[i].y, "arcade-machine-front-pixelated");
+		game.physics.enable(s, Phaser.Physics.ARCADE);
+		s.body.immovable = true;
 		s.scale.setTo(machineScale, machineScale);
+		s.body.setSize(30,20,60,50);
+		colliders.add(s);
 	}
 
 	var sideMachineScale = 1;
-	var sideArcadeMachineLocations = [{x:-200,y:100, sprite:"arcade-machine-side-perspective-red", reverse:false}, {x:-200,y:200,sprite:"arcade-machine-side-perspective-blue", reverse:false}, {x:-200,y:300, sprite:"arcade-machine-side-perspective-purple", reverse:false}, {x:200,y:200,sprite:"arcade-machine-side-perspective-green", reverse:true}, {x:200,y:300,sprite:"arcade-machine-side-perspective-blue", reverse:true}, {x:260,y:200, sprite:"arcade-machine-side-perspective-purple", reverse:false}, {x:260,y:300, sprite:"arcade-machine-side-perspective-red", reverse:false}];
+	var sideArcadeMachineLocations = [{x:0,y:200, sprite:"arcade-machine-side-perspective-red", reverse:false}, {x:0,y:400,sprite:"arcade-machine-side-perspective-blue", reverse:false}, {x:0,y:300, sprite:"arcade-machine-side-perspective-purple", reverse:false}, {x:400,y:300,sprite:"arcade-machine-side-perspective-green", reverse:true}, {x:400,y:400,sprite:"arcade-machine-side-perspective-blue", reverse:true}, {x:470,y:400, sprite:"arcade-machine-side-perspective-purple", reverse:false}, {x:470,y:300, sprite:"arcade-machine-side-perspective-red", reverse:false}];
 	for (var i = 0; i < sideArcadeMachineLocations.length; i++){
 		var s = game.add.sprite(sideArcadeMachineLocations[i].x, sideArcadeMachineLocations[i].y, sideArcadeMachineLocations[i].sprite);
-		s.scale.setTo(sideMachineScale, sideMachineScale);
+		s.scale.setTo(sideMachineScale, sideMachineScale+.5);
 		if (sideArcadeMachineLocations[i].reverse){
 			s.anchor.setTo(.75,0);
 			s.scale.x *= -1;
 		}
+		game.physics.enable(s, Phaser.Physics.ARCADE);
+		s.body.immovable = true;
+		s.body.setSize(30,20,30,20);
+		colliders.add(s);
 	}
 
 	var flashingScaleX = .4, flashingScaleY=.7;
@@ -89,6 +127,14 @@ function loadArcadeMachines(){
 		}
 		s.animations.add(animationName);
 		s.animations.play(animationName, flashingAnimationLocations[i].speed, true);
+	}
+
+	//out of order textures
+	var OOOTextureName="no-play";
+	var OOOObjects=[{x:160,y:90},{x:360,y:90}]
+	for (var i = 0; i < OOOObjects.length;i++){
+		var s = game.add.sprite(OOOObjects[i].x, OOOObjects[i].y, OOOTextureName);
+		s.scale.setTo(.2,.2);
 	}
 }
 
