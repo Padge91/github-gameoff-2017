@@ -17,7 +17,7 @@ function preload() {
 function loadAnimations(){
 	var animationsPath="/images/";
 	var extension=".png";
-	var animations=[{name:"arcade-screen", x:320,y:270,size:2}];
+	var animations=[{name:"arcade-screen", x:320,y:270,size:2},{name:"player-walking-backward",x:205,y:340,size:3},{name:"player-walking-forward",x:205,y:340,size:4},{name:"player-walking-left",x:270,y:340,size:4},{name:"player-walking-right",x:260,y:340,size:4}];
 	
 	for (var i = 0; i < animations.length; i++){
 		game.load.spritesheet(animations[i].name, animationsPath+animations[i].name+extension, animations[i].x, animations[i].y, animations[i].size);
@@ -52,14 +52,19 @@ function loadArcadeScene(){
 
 //load player
 function loadPlayer(){
-	player = game.add.sprite(100,100,'character1');
-	player.scale.setTo(.3,.3);
+	player = game.add.sprite(800,400,'player-walking-left');
+	player.scale.setTo(.2,.2);
 	cursors = game.input.keyboard.createCursorKeys();
 
 	game.physics.startSystem(Phaser.Physics.ARCADE);
 	game.physics.arcade.enable(player, Phaser.Physics.ARCADE);
-	//game.world.setBounds(0, 0, gameWindowSize.x, gameWindowSize.y);
+	game.world.setBounds(0, 0, gameWindowSize.x, gameWindowSize.y);
 
+	player.animations.add("player-walking-left");
+	player.animations.add("player-walking-right");
+	player.animations.add("player-walking-forward");
+	player.animations.add("player-walking-backward");
+	
 }
 
 
@@ -70,14 +75,22 @@ function update(){
 	game.physics.arcade.collide(player, colliders);
 
 	if (cursors.up.isDown){
+		player.animations.play("player-walking-backward", 10, true);
 		player.body.velocity.y -= speed;
 	} else if (cursors.down.isDown){
+		player.animations.play("player-walking-forward", 10, true);
 		player.body.velocity.y += speed;
 	}
 	if (cursors.left.isDown){
+		player.animations.play("player-walking-left", 10, true);
 		player.body.velocity.x -= speed;
 	} else if (cursors.right.isDown){
+		player.animations.play("player-walking-right", 10, true);
 		player.body.velocity.x += speed;
+	}
+
+	if (cursors.right.isUp && cursors.left.isUp && cursors.up.isUp && cursors.down.isUp){
+		player.animations.stop();
 	}
 }
 
@@ -94,7 +107,7 @@ function loadArcadeMachines(){
 		game.physics.enable(s, Phaser.Physics.ARCADE);
 		s.body.immovable = true;
 		s.scale.setTo(machineScale, machineScale);
-		s.body.setSize(30,20,60,50);
+		s.body.setSize(120,100,20,0);
 		colliders.add(s);
 	}
 
@@ -109,7 +122,7 @@ function loadArcadeMachines(){
 		}
 		game.physics.enable(s, Phaser.Physics.ARCADE);
 		s.body.immovable = true;
-		s.body.setSize(30,20,30,20);
+		s.body.setSize(100,50,0,0);
 		colliders.add(s);
 	}
 
@@ -152,7 +165,7 @@ function loadNPCs(){
                 }
 		game.physics.enable(s, Phaser.Physics.ARCADE);
 		s.body.immovable = true;
-		s.body.setSize(-110,-50,270,200);
+		s.body.setSize(220,100,0,80);
 		colliders.add(s);
 
 	}
